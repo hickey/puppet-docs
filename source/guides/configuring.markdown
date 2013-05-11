@@ -224,13 +224,15 @@ Example:
 
 ### `autosign.conf`
 
-The `autosign.conf` file (located at `/etc/puppet/autosign.conf` by default, and configurable with the `autosign` setting) is a list of certnames or certname globs (one per line) whose certificate requests will automatically be signed.
+The `autosign.conf` file (located at `/etc/puppet/autosign.conf` by default, and configurable with the `autosign` setting) is a list of certnames or certname globs (one per line) whose certificate requests will automatically be signed. In Puppet 3.x you are able to also list one or more paths to executables to allow decision to sign a request to be sent to a script. 
 
     rebuilt.example.com
     *.scratch.example.com
     *.local
 
 Note that certname globs do not function as normal globs: an asterisk can only represent one or more subdomains at the front of a certname that resembles a fully-qualified domain name. (That is, if your certnames don't look like FQDNs, you can't use `autosign.conf` to full effect.
+
+The autosign hook is expected to accept a single command line option which will be the certname of the host that sent the signing request. The exit status of the hook is evaluated to determine if the signing request should succeed. If the hook returns a status of 0 the request will be authorized, otherwise the request will fail. Any output from the hook will be recorded in the log so that the hook can provide a explanation for the action (either acceptance or rejection). Multiple hooks may be specified so that different signing policies can be implemented easily. 
 
 As any host can provide any certname, autosigning should only be used with great care, and only in situations where you essentially trust any computer able to connect to the puppet master.
 
